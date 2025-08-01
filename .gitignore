@@ -1,4 +1,7 @@
 .venv/
 __pycache__/
+dataset/
+training_checkpoints/
 **/.DS_Store
 **/.ipynb_checkpoints/
+saved_model.zip
