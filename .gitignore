@@ -2,6 +2,7 @@
 __pycache__/
 dataset/
 training_checkpoints/
+saved_model/
 **/.DS_Store
 **/.ipynb_checkpoints/
 saved_model.zip
