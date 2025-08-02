@@ -1,13 +1,14 @@
 import tensorflow as tf
 
 class OneStep(tf.keras.Model):
-    def __init__(self, model, chars_from_ids, ids_from_chars):
+    def __init__(self, model, vocabulary):
         super().__init__()
         self.model = model
-        self.chars_from_ids = chars_from_ids
-        self.ids_from_chars = ids_from_chars
+        self.vocabulary = vocabulary
+        self.ids_from_chars = tf.keras.layers.StringLookup(vocabulary=self.vocabulary, mask_token=None)
+        self.chars_from_ids = tf.keras.layers.StringLookup(vocabulary=self.vocabulary, mask_token=None, invert=True)
         skip_ids = self.ids_from_chars(['[UNK]'])[:, None]
-        sparse_mask = tf.SparseTensor(values=[-float('inf')]*len(skip_ids), indices=skip_ids, dense_shape=[len(ids_from_chars.get_vocabulary())])
+        sparse_mask = tf.SparseTensor(values=[-float('inf')]*len(skip_ids), indices=skip_ids, dense_shape=[len(self.vocabulary)])
         self.prediction_mask = tf.sparse.to_dense(sparse_mask)
 
     @tf.function
