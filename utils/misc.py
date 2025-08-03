@@ -11,14 +11,14 @@ def get_distribute_strategy(tpu="local"):
         tf.config.experimental_connect_to_cluster(cluster_resolver)
         tf.tpu.experimental.initialize_tpu_system(cluster_resolver)
         strategy = tf.distribute.TPUStrategy(cluster_resolver)
-        print("Using Tpu")
+        print("Using TPU for training")
     except:
         if tf.config.list_physical_devices('GPU'):
             strategy = tf.distribute.MirroredStrategy()
-            print('Using GPU')
+            print("Using GPU for training")
         else:
             strategy = tf.distribute.get_strategy()
-            print("Using CPU")  
+            print("Using CPU for training")
     return strategy
 
 def load_config(path: str) -> dict:
