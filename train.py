@@ -8,6 +8,7 @@ from utils.cleaning import Cleaner
 from types import SimpleNamespace
 from pathlib import Path
 import sys
+import argparse
 
 def train_char_lm(configs: dict, text_file_path: Path):
     # Load configuration parameters
@@ -92,13 +93,17 @@ def clean_dataset(configs: dict) -> Path:
     return cleaned_file_path
 
 if __name__ == "__main__":
+    # Load configuration parameters
     config_dict = misc.load_config("config.yaml")
-    # Provide a cleaned text file unless you want to run the cleaning process from scratch
-    # using the Hugging Face dataset defined in the config.yaml file
-    try:
-        cleaned_file_path = sys.argv[1]
-    except IndexError:
+    desc = (
+        "Provide the path of a cleaned text file unless you want to run the cleaning process "
+        "from scratch using the Hugging Face dataset defined in the config.yaml file")
+    # Parse CLI arguments
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument("--file", type=str, required=False, help="Cleaned file path")
+    args = parser.parse_args()
+    cleaned_file_path = args.file
+    if not args.file:
         cleaned_file_path = clean_dataset(config_dict)
     history = train_char_lm(config_dict, cleaned_file_path)
-    
     

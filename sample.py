@@ -1,6 +1,7 @@
 import tensorflow as tf
 from utils import misc
 from types import SimpleNamespace
+import argparse
 
 def sample(configs: dict, initial_input_str: str, sample_size: int, temperature: float = 1.0):
     # Load configuration parameters
@@ -22,6 +23,14 @@ def sample(configs: dict, initial_input_str: str, sample_size: int, temperature:
     return result
 
 if __name__ == "__main__":
+    # Load configuration parameters
     config_dict = misc.load_config("config.yaml")
-    generated_sample = sample(configs=config_dict, initial_input_str='k', sample_size=100, temperature=0.8)
+    # Parse CLI arguments
+    parser = argparse.ArgumentParser(description="Provide initial input string, sample size and temperature")
+    parser.add_argument("--string", type=str, required=True, help="Initial input string")
+    parser.add_argument("--length", type=int, required=True, help="Sample size")
+    parser.add_argument("--temperature", type=float, required=True, help="Temperature")
+    args = parser.parse_args()
+    # Sample text
+    generated_sample = sample(configs=config_dict, initial_input_str=args.string, sample_size=args.length, temperature=args.temperature)
     print(generated_sample[0].numpy().decode('UTF-8'))
