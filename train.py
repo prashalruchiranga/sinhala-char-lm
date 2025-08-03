@@ -7,14 +7,12 @@ from models.one_step_model import OneStep
 from utils.cleaning import Cleaner
 from types import SimpleNamespace
 from pathlib import Path
+import sys
 
 def train_char_lm(configs: dict, text_file_path: Path):
     # Load configuration parameters
     configs = SimpleNamespace(**configs)
     es_configs = SimpleNamespace(**configs.early_stopping)
-                    
-    # Set distribute strategy for training
-    strategy = misc.get_distribute_strategy()
 
     # Load cleaned text data to memory
     with open(text_file_path, "r") as file:
@@ -54,6 +52,9 @@ def train_char_lm(configs: dict, text_file_path: Path):
         restore_best_weights=es_configs.restore_best_weights
     )
 
+    # Set distribute strategy for training
+    strategy = misc.get_distribute_strategy()
+
     # Create and compile the model within the distribution strategy scope
     with strategy.scope():
         model = GRUModel(vocab_size=vocab_size, embedding_dim=configs.embedding_dim, rnn_units=configs.rnn_units)
@@ -92,6 +93,12 @@ def clean_dataset(configs: dict) -> Path:
 
 if __name__ == "__main__":
     config_dict = misc.load_config("config.yaml")
-    cleaned_file_path = clean_dataset(config_dict)
+    # Provide a cleaned text file unless you want to run the cleaning process from scratch
+    # using the Hugging Face dataset defined in the config.yaml file
+    try:
+        cleaned_file_path = sys.argv[1]
+    except IndexError:
+        cleaned_file_path = clean_dataset(config_dict)
     history = train_char_lm(config_dict, cleaned_file_path)
-
+    
+    
